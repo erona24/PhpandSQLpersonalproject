@@ -1,13 +1,13 @@
 <?php
-$user = "root";
-$pass = "";
-$dbname = "task_tracker";
 $server = "localhost";
+$user   = "root";
+$pass   = "";
+$dbname = "task_tracker";
 
 try {
-    $conn = new PDO("mysql:host=$server;dbname=$dbname", $user, $pass);
+    $conn = new PDO("mysql:host=$server;dbname=$dbname;charset=utf8mb4", $user, $pass);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
-    echo "Error: " . $e->getMessage();
+    die("Connection failed: " . $e->getMessage());
 }
 ?>
