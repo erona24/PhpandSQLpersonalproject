@@ -11,8 +11,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 $action = $_GET['action'] ?? '';
-
-// Read JSON data from JavaScript Fetch
 $input = json_decode(file_get_contents('php://input'), true);
 
 try {
@@ -23,7 +21,7 @@ try {
     } 
     elseif ($action === 'add' && !empty($input['title'])) {
         $stmt = $pdo->prepare("INSERT INTO tasks (user_id, title, priority) VALUES (?, ?, ?)");
-        $stmt->execute([$user_id, $input['title'], $input['priority']]);
+        $stmt->execute([$user_id, $input['title'], $input['priority'] ?? 'medium']);
         echo json_encode(['status' => 'success', 'id' => $pdo->lastInsertId()]);
     } 
     elseif ($action === 'toggle') {
@@ -37,6 +35,7 @@ try {
         echo json_encode(['status' => 'success']);
     }
 } catch (Exception $e) {
+    http_response_code(500);
     echo json_encode(['error' => $e->getMessage()]);
 }
 ?>

@@ -1,14 +1,17 @@
 <?php
 require_once 'config.php';
 session_start();
+
 // If not logged in, kick them back to auth.php
 if (!isset($_SESSION['user_id'])) {
     header("Location: auth.php");
     exit;
 }
-// Handle Logout
+
+// Handle Logout logic
 if (isset($_GET['logout'])) {
-    session_destroy();
+    $_SESSION = array(); // Clear session variables
+    session_destroy();   // Destroy session
     header("Location: auth.php");
     exit;
 }
@@ -17,19 +20,32 @@ if (isset($_GET['logout'])) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TaskMate Pro | Website</title>
+    <title>TaskMate Pro | Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root { --p-purple: #6A5AE0; --bg: #f4f7fe; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); }
-        .header { background: linear-gradient(135deg, #6A5AE0, #9B84E5); padding: 60px 0 140px; color: white; }
-        .stats-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.2); }
-        .main-container { max-width: 800px; margin: -80px auto 50px; background: white; border-radius: 30px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        
+        .header { background: linear-gradient(135deg, #6A5AE0, #9B84E5); padding: 40px 0 120px; color: white; position: relative; }
+        
+        /* Logout Button Style */
+        .logout-container { position: absolute; top: 20px; right: 20px; }
+        .btn-logout { 
+            color: white; text-decoration: none; background: rgba(255,255,255,0.1); 
+            padding: 8px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px); font-weight: 600; transition: 0.3s;
+        }
+        .btn-logout:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); color: white; }
+
+        .stats-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.2); min-width: 120px; }
+        .main-container { max-width: 800px; margin: -60px auto 50px; background: white; border-radius: 30px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        
         .task-row { display: flex; align-items: center; justify-content: space-between; padding: 15px; border: 1px solid #eee; border-radius: 15px; margin-bottom: 10px; transition: 0.2s; }
         .task-row:hover { border-color: var(--p-purple); transform: translateX(5px); }
         .completed { text-decoration: line-through; opacity: 0.5; }
+        
         .priority-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 10px; }
         .high { background: #ff7675; } .medium { background: #fdcb6e; } .low { background: #55efc4; }
     </style>
@@ -37,8 +53,16 @@ if (isset($_GET['logout'])) {
 <body>
 
 <div class="header text-center">
+    <!-- Logout Button -->
+    <div class="logout-container">
+        <a href="index.php?logout=1" class="btn-logout">
+            <i class="bi bi-box-arrow-right me-2"></i>Logout
+        </a>
+    </div>
+
     <h1>TaskMate Dashboard</h1>
-    <p>Logged in as <b><?php echo $_SESSION['user_name']; ?></b></p>
+    <p>Logged in as <b><?php echo htmlspecialchars($_SESSION['user_name']); ?></b></p>
+    
     <div class="container d-flex justify-content-center gap-3 mt-4">
         <div class="stats-card"> <h2 id="totalCount">0</h2> <small>TOTAL</small> </div>
         <div class="stats-card"> <h2 id="pendingCount">0</h2> <small>PENDING</small> </div>
@@ -53,11 +77,11 @@ if (isset($_GET['logout'])) {
             <option value="medium" selected>Medium</option>
             <option value="low">Low</option>
         </select>
-        <button class="btn btn-primary rounded-3 px-4" onclick="addTask()">Add</button>
+        <button class="btn btn-primary rounded-3 px-4" onclick="addTask()">Add Task</button>
     </div>
-
+    
     <div id="taskList">
-        <!-- Tasks will load here automatically -->
+        <!-- Tasks load here -->
     </div>
 </div>
 
@@ -65,13 +89,12 @@ if (isset($_GET['logout'])) {
 async function loadTasks() {
     const res = await fetch('api.php?action=fetch');
     const tasks = await res.json();
-    
     const list = document.getElementById('taskList');
     list.innerHTML = '';
     
     document.getElementById('totalCount').innerText = tasks.length;
     document.getElementById('pendingCount').innerText = tasks.filter(t => t.completed == 0).length;
-
+    
     tasks.forEach(t => {
         const div = document.createElement('div');
         div.className = 'task-row';
@@ -93,13 +116,11 @@ async function addTask() {
     const title = document.getElementById('taskTitle').value;
     const priority = document.getElementById('taskPriority').value;
     if (!title) return;
-
     await fetch('api.php?action=add', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, priority })
     });
-
     document.getElementById('taskTitle').value = '';
     loadTasks();
 }
@@ -123,9 +144,7 @@ async function deleteTask(id) {
     loadTasks();
 }
 
-// Initial load
 loadTasks();
 </script>
-
 </body>
 </html>
