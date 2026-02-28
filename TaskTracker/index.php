@@ -1,11 +1,16 @@
 <?php
 require_once 'config.php';
 session_start();
-
-// Simple Login Simulation (For this setup, we auto-login to User ID 1)
+// If not logged in, kick them back to auth.php
 if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1; 
-    $_SESSION['user_name'] = 'Admin User';
+    header("Location: auth.php");
+    exit;
+}
+// Handle Logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: auth.php");
+    exit;
 }
 ?>
 <!DOCTYPE html>
