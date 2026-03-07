@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 // Handle Logout logic
 if (isset($_GET['logout'])) {
     $_SESSION = array(); // Clear session variables
-    session_destroy();   // Destroy session
+    session_destroy();  
     header("Location: auth.php");
     exit;
 }

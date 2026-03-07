@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #6A5AE0, #9B84E5); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         .auth-card { background: white; padding: 40px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
-        .btn-primary { background: #6A5AE0; border: none; padding: 12px; border-radius: 12px; font-weight: 700; }
+        .btn-primary { background: #2d2470ff; border: none; padding: 12px; border-radius: 12px; font-weight: 700; }
         .btn-primary:hover { background: #5649c0; }
         .toggle-link { color: #6A5AE0; cursor: pointer; font-weight: 600; text-decoration: none; }
     </style>
